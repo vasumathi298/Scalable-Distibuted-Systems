@@ -1,0 +1,4 @@
+[2023-10-04 18:48:06.720] INFO - PUT a 76 #1696459678114
+[2023-10-04 18:48:06.773] INFO - Put operation success packet_id: #1696459678114 InetAddress: /127.0.0.1 port: 1234
+[2023-10-04 18:48:13.507] INFO - GET b #1696459686776
+[2023-10-04 18:48:13.508] INFO - Get operation success packet_id: #1696459686776 InetAddress: /127.0.0.1 port: 1234
