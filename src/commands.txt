@@ -1,0 +1,19 @@
+PUT 1 NewYork
+PUT 2 Boston
+PUT 3 California
+PUT 4 Vermont
+PUT 5 Texas
+GET 1
+GET 2
+GET 3
+GET 4
+GET 5
+DELETE 1
+DELETE 2
+DELETE 3
+DELETE 4
+DELETE 5
+GETjh 123
+GET 4
+DELETE 2
+PUT 1 Aganda 12
