@@ -1,0 +1,36 @@
+Dec 06, 2023 10:28:58 AM com.cs6650.Client start
+INFO: Remote connection established  [ host:localhost, port:1234 ]
+Dec 06, 2023 10:29:24 AM com.cs6650.Client start
+INFO: Request Query [ipaddress=localhost, type=put, key=a, value=5]
+Dec 06, 2023 10:29:24 AM com.cs6650.Client start
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 06, 2023 10:29:28 AM com.cs6650.Client start
+INFO: Request Query [ipaddress=localhost, type=get, key=a]
+Dec 06, 2023 10:29:28 AM com.cs6650.Client start
+INFO: Response [type=get, returnValue=5, message=successfully retrieved entry from storage]
+Dec 06, 2023 10:32:04 AM com.cs6650.Client start
+INFO: Remote connection established  [ host:localhost, port:1234 ]
+Dec 06, 2023 10:32:22 AM com.cs6650.Client start
+INFO: Request Query [ipaddress=localhost, type=put, key=a, value=1]
+Dec 06, 2023 10:32:22 AM com.cs6650.Client start
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 06, 2023 10:32:28 AM com.cs6650.Client start
+INFO: Request Query [ipaddress=localhost, type=put, key=b, value=2]
+Dec 06, 2023 10:32:28 AM com.cs6650.Client start
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 06, 2023 10:32:38 AM com.cs6650.Client start
+INFO: Request Query [ipaddress=localhost, type=get, key=b]
+Dec 06, 2023 10:32:38 AM com.cs6650.Client start
+INFO: Response [type=get, returnValue=2, message=successfully retrieved entry from storage]
+Dec 06, 2023 10:32:46 AM com.cs6650.Client start
+INFO: Request Query [ipaddress=localhost, type=put, key=b, value=5]
+Dec 06, 2023 10:32:46 AM com.cs6650.Client start
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 06, 2023 10:32:49 AM com.cs6650.Client start
+INFO: Request Query [ipaddress=localhost, type=get, key=b]
+Dec 06, 2023 10:32:49 AM com.cs6650.Client start
+INFO: Response [type=get, returnValue=5, message=successfully retrieved entry from storage]
+Dec 06, 2023 10:34:40 AM com.cs6650.Client start
+INFO: Request Query [ipaddress=localhost, type=get, key=c]
+Dec 06, 2023 10:34:40 AM com.cs6650.Client start
+INFO: Response [type=get, returnValue=3, message=successfully retrieved entry from storage]

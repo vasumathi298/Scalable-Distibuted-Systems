@@ -1,0 +1,244 @@
+Dec 06, 2023 10:26:25 AM server.Server main
+INFO: Server started
+Dec 06, 2023 10:27:45 AM server.Server main
+INFO: Server started
+Dec 06, 2023 10:27:45 AM server.Server main
+INFO: Server trying to connect to a cluster
+Dec 06, 2023 10:27:45 AM server.Server main
+INFO: Could not connect to any cluster, acting as a standalone cluster
+Dec 06, 2023 10:29:24 AM server.Server put
+INFO: Request Query [type=put, key=a, value=5]
+Dec 06, 2023 10:29:24 AM server.Server put
+INFO: Invoking Proposer
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: New Paxos round started
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: New proposal number is 1701876564032
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Sending prepare to server: Server
+Dec 06, 2023 10:29:24 AM server.Server prepare
+INFO: Promising for proposal number: 1701876564032
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Received promise
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Majority of acceptors promised
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Value for accept: Transaction [type=put, key=a, value=5]
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Sending accept to server: Server
+Dec 06, 2023 10:29:24 AM server.Server accept
+INFO: Accept request confirmed for transaction: Transaction [type=put, key=a, value=5]
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Received accept
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Majority of acceptors accepted
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Invoking Learners
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Invoking learner: Server
+Dec 06, 2023 10:29:24 AM server.Server invokeLearner
+INFO: Learner invoked
+Dec 06, 2023 10:29:24 AM server.Server invokeLearner
+INFO: Learned a new value: Transaction [type=put, key=a, value=5]
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Learner was able to successfully learn
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Learning job finished
+Dec 06, 2023 10:29:24 AM server.Server invokeProposer
+INFO: Paxos round ended
+Dec 06, 2023 10:29:24 AM server.Server put
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 06, 2023 10:29:28 AM server.Server get
+INFO: Request Query [type=get, key=a]
+Dec 06, 2023 10:29:28 AM server.Server get
+INFO: Response [type=get, returnValue=5, message=successfully retrieved entry from storage]
+Dec 06, 2023 10:31:50 AM server.Server main
+INFO: Server started
+Dec 06, 2023 10:31:50 AM server.Server main
+INFO: Server trying to connect to a cluster
+Dec 06, 2023 10:31:50 AM server.Server main
+INFO: Could not connect to any cluster, acting as a standalone cluster
+Dec 06, 2023 10:32:22 AM server.Server put
+INFO: Request Query [type=put, key=a, value=1]
+Dec 06, 2023 10:32:22 AM server.Server put
+INFO: Invoking Proposer
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: New Paxos round started
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: New proposal number is 1701876742528
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Sending prepare to server: Server
+Dec 06, 2023 10:32:22 AM server.Server prepare
+INFO: Promising for proposal number: 1701876742528
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Received promise
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Majority of acceptors promised
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Value for accept: Transaction [type=put, key=a, value=1]
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Sending accept to server: Server
+Dec 06, 2023 10:32:22 AM server.Server accept
+INFO: Accept request confirmed for transaction: Transaction [type=put, key=a, value=1]
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Received accept
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Majority of acceptors accepted
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Invoking Learners
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Invoking learner: Server
+Dec 06, 2023 10:32:22 AM server.Server invokeLearner
+INFO: Learner invoked
+Dec 06, 2023 10:32:22 AM server.Server invokeLearner
+INFO: Learned a new value: Transaction [type=put, key=a, value=1]
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Learner was able to successfully learn
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Learning job finished
+Dec 06, 2023 10:32:22 AM server.Server invokeProposer
+INFO: Paxos round ended
+Dec 06, 2023 10:32:22 AM server.Server put
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 06, 2023 10:32:28 AM server.Server put
+INFO: Request Query [type=put, key=b, value=2]
+Dec 06, 2023 10:32:28 AM server.Server put
+INFO: Invoking Proposer
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: New Paxos round started
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: New proposal number is 1701876748457
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Sending prepare to server: Server
+Dec 06, 2023 10:32:28 AM server.Server prepare
+INFO: Promising for proposal number: 1701876748457
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Received promise
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Majority of acceptors promised
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Value for accept: Transaction [type=put, key=b, value=2]
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Sending accept to server: Server
+Dec 06, 2023 10:32:28 AM server.Server accept
+INFO: Accept request confirmed for transaction: Transaction [type=put, key=b, value=2]
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Received accept
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Majority of acceptors accepted
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Invoking Learners
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Invoking learner: Server
+Dec 06, 2023 10:32:28 AM server.Server invokeLearner
+INFO: Learner invoked
+Dec 06, 2023 10:32:28 AM server.Server invokeLearner
+INFO: Learned a new value: Transaction [type=put, key=b, value=2]
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Learner was able to successfully learn
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Learning job finished
+Dec 06, 2023 10:32:28 AM server.Server invokeProposer
+INFO: Paxos round ended
+Dec 06, 2023 10:32:28 AM server.Server put
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 06, 2023 10:32:38 AM server.Server get
+INFO: Request Query [type=get, key=b]
+Dec 06, 2023 10:32:38 AM server.Server get
+INFO: Response [type=get, returnValue=2, message=successfully retrieved entry from storage]
+Dec 06, 2023 10:32:46 AM server.Server put
+INFO: Request Query [type=put, key=b, value=5]
+Dec 06, 2023 10:32:46 AM server.Server put
+INFO: Invoking Proposer
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: New Paxos round started
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: New proposal number is 1701876766014
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Sending prepare to server: Server
+Dec 06, 2023 10:32:46 AM server.Server prepare
+INFO: Promising for proposal number: 1701876766014
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Received promise
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Majority of acceptors promised
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Value for accept: Transaction [type=put, key=b, value=5]
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Sending accept to server: Server
+Dec 06, 2023 10:32:46 AM server.Server accept
+INFO: Accept request confirmed for transaction: Transaction [type=put, key=b, value=5]
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Received accept
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Majority of acceptors accepted
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Invoking Learners
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Invoking learner: Server
+Dec 06, 2023 10:32:46 AM server.Server invokeLearner
+INFO: Learner invoked
+Dec 06, 2023 10:32:46 AM server.Server invokeLearner
+INFO: Learned a new value: Transaction [type=put, key=b, value=5]
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Learner was able to successfully learn
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Learning job finished
+Dec 06, 2023 10:32:46 AM server.Server invokeProposer
+INFO: Paxos round ended
+Dec 06, 2023 10:32:46 AM server.Server put
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 06, 2023 10:32:49 AM server.Server get
+INFO: Request Query [type=get, key=b]
+Dec 06, 2023 10:32:49 AM server.Server get
+INFO: Response [type=get, returnValue=5, message=successfully retrieved entry from storage]
+Dec 06, 2023 10:34:13 AM server.Server put
+INFO: Request Query [type=put, key=c, value=3]
+Dec 06, 2023 10:34:13 AM server.Server put
+INFO: Invoking Proposer
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: New Paxos round started
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: New proposal number is 1701876853327
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Sending prepare to server: Server
+Dec 06, 2023 10:34:13 AM server.Server prepare
+INFO: Promising for proposal number: 1701876853327
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Received promise
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Majority of acceptors promised
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Value for accept: Transaction [type=put, key=c, value=3]
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Sending accept to server: Server
+Dec 06, 2023 10:34:13 AM server.Server accept
+INFO: Accept request confirmed for transaction: Transaction [type=put, key=c, value=3]
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Received accept
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Majority of acceptors accepted
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Invoking Learners
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Invoking learner: Server
+Dec 06, 2023 10:34:13 AM server.Server invokeLearner
+INFO: Learner invoked
+Dec 06, 2023 10:34:13 AM server.Server invokeLearner
+INFO: Learned a new value: Transaction [type=put, key=c, value=3]
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Learner was able to successfully learn
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Learning job finished
+Dec 06, 2023 10:34:13 AM server.Server invokeProposer
+INFO: Paxos round ended
+Dec 06, 2023 10:34:13 AM server.Server put
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 06, 2023 10:34:17 AM server.Server get
+INFO: Request Query [type=get, key=b]
+Dec 06, 2023 10:34:17 AM server.Server get
+INFO: Response [type=get, returnValue=5, message=successfully retrieved entry from storage]
+Dec 06, 2023 10:34:40 AM server.Server get
+INFO: Request Query [type=get, key=c]
+Dec 06, 2023 10:34:40 AM server.Server get
+INFO: Response [type=get, returnValue=3, message=successfully retrieved entry from storage]
