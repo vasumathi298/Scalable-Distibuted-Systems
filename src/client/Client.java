@@ -1,6 +1,6 @@
 package client;
 
-import server.DatastoreInterface;
+import server.KVDataStore;
 import server.Response;
 
 import java.rmi.Naming;
@@ -13,149 +13,139 @@ import java.io.*;
 public class Client 
 { 
 
-	private static DatastoreInterface datastore;
+	private static KVDataStore keyValueDataStore;
 
-	private String address;
-	private int port;
+	private String hostAddress;
+	private int portNo;
 
-	private BufferedReader reader =  new BufferedReader(new InputStreamReader(System.in));
+	private BufferedReader inputReader =  new BufferedReader(new InputStreamReader(System.in));
 
 	// Client log is stored in logs folder
-	private Logger logger = getLogger("client.log");
+	private Logger clientLogger = retrieveClientLogger("client.log");
 
-	public Client(String address, int port) 
+	public Client(String hostAddress, int portNo)
 	{ 
-		this.address = address;
-		this.port = port;
+		this.hostAddress = hostAddress;
+		this.portNo = portNo;
 	} 
 
-	public void start() {
+	public void launchClient() {
 		while(true) {
 			try
 			{
-				datastore = (DatastoreInterface) Naming.lookup("//"+address+":"+port+"/Server");
+				keyValueDataStore = (KVDataStore) Naming.lookup("//"+ hostAddress +":"+ portNo +"/Server");
 
-				System.out.println("Remote connection established  [ host:"+address+", port:"+port+" ]");
-				logger.info("Remote connection established  [ host:"+address+", port:"+port+" ]");
+				System.out.println("Remote connection established  [ host:"+ hostAddress +", port:"+ portNo +" ]");
+				clientLogger.info("Remote connection established  [ host:"+ hostAddress +", port:"+ portNo +" ]");
 
 
-				String command ="";
+				String instructionsToExecute ="";
 
-				while (!command.equals("exit")) 
+				while (!instructionsToExecute.equals("exit"))
 				{ 
 					try
 					{ 
 						// Reads the request command from the user
 						System.out.print("Enter request type (put/get/delete/exit): ");
-						reader = new BufferedReader(new InputStreamReader(System.in));
-						command = reader.readLine().toLowerCase().trim();
+						inputReader = new BufferedReader(new InputStreamReader(System.in));
+						instructionsToExecute = inputReader.readLine().toLowerCase().trim();
 
 
-						if(command.equals("put")) {
-							System.out.print("Enter key: ");
-							String key = reader.readLine();
-							System.out.print("Enter value: ");
-							String value = reader.readLine();
-							logger.info("Request Query [ipaddress=" + this.address + ", type=" + command + ", key=" + key + ", value=" + value + "]");
+						if(instructionsToExecute.equals("put")) {
+							System.out.print("Enter the key to be stored: ");
+							String keyToStore = inputReader.readLine();
+							System.out.print("Enter value to be stored for the above key: ");
+							String valueToTheKey = inputReader.readLine();
+							clientLogger.info("Request Query [ipaddress=" + this.hostAddress + ", type=" + instructionsToExecute + ", key=" + keyToStore + ", value=" + valueToTheKey + "]");
 
-							// calls a remote procedure 'put'
-							Response response = datastore.put(key, value);
-							logger.info(response.toString());
-							System.out.println("Response Message: "+response.getMessage());
+							Response serverResponse = keyValueDataStore.putOperation(keyToStore, valueToTheKey);
+							clientLogger.info(serverResponse.toString());
+							System.out.println("Server Response Message: "+serverResponse.getResponseMessage());
 
 						}
-						else if(command.equals("get")) {
-							System.out.print("Enter key: ");
-							String key = reader.readLine();
-							logger.info("Request Query [ipaddress=" + this.address + ", type=" + command + ", key=" + key + "]");
+						else if(instructionsToExecute.equals("get")) {
+							System.out.print("Enter the key to be retrieved: ");
+							String key = inputReader.readLine();
+							clientLogger.info("Request Query [ipaddress=" + this.hostAddress + ", type=" + instructionsToExecute + ", key=" + key + "]");
 
-							// calls a remote procedure 'get'
-							Response response = datastore.get(key);
-							logger.info(response.toString());
-							System.out.println("Response Message: "+response.getMessage());
-							System.out.println("Response result: "+response.getReturnValue());
+							Response serverResponse = keyValueDataStore.getOperation(key);
+							clientLogger.info(serverResponse.toString());
+							System.out.println("Response Message: "+serverResponse.getResponseMessage());
+							System.out.println("Response result: "+serverResponse.getReturnValue());
 						}
-						else if(command.equals("delete")) {
-							System.out.print("Enter key: ");
-							String key = reader.readLine();
-							logger.info("Request Query [ipaddress=" + this.address + ", type=" + command + ", key=" + key + "]");
+						else if(instructionsToExecute.equals("delete")) {
+							System.out.print("Enter the key to be deleted: ");
+							String key = inputReader.readLine();
+							clientLogger.info("Request Query [ipaddress=" + this.hostAddress + ", type=" + instructionsToExecute + ", key=" + key + "]");
 
-							// calls a remote procedure 'delete'
-							Response response = datastore.delete(key);
-							logger.info(response.toString());
-							System.out.println("Response Message: "+response.getMessage());
+							Response serverResponse = keyValueDataStore.delete(key);
+							clientLogger.info(serverResponse.toString());
+							System.out.println("Response Message: "+serverResponse.getResponseMessage());
 						}
 					}
 					catch(Exception e) {
 						System.out.println("Request cannot be completed, trying to re-establish connection");
-						logger.log(Level.SEVERE, "Request cannot be completed", e);
+						clientLogger.log(Level.SEVERE, "Request cannot be completed", e);
 						break;
 					}
 
 				}
 				
-				if(command.equals("exit")) {
+				if(instructionsToExecute.equals("exit")) {
 					break;
 				}
 			}
 			catch (Exception e) {
 				System.out.println("Remote connection failed, trying again in 5 seconds");
-				logger.log(Level.SEVERE, "Remote connection failed", e);
+				clientLogger.log(Level.SEVERE, "Remote connection failed", e);
 				
 				
 				// wait for 5 seconds before trying to re-establish connection
 				try {
 					Thread.sleep(5000);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				} catch (InterruptedException interruptedException) {
+					interruptedException.printStackTrace();
 				}
 			}
 		}
 
 	}
 
-	//takes in the log-file path and builds a logger object
-	private Logger getLogger(String logFile) {
-		Logger logger = Logger.getLogger("client_log");  
-		FileHandler fh;  
+	private Logger retrieveClientLogger(String clientLogFile) {
+		Logger clientLogger = Logger.getLogger("client_log");
+		clientLogger.setUseParentHandlers(false);
+
+		FileHandler clientLogFileHandler;
 
 		try {  
-			// This stops logs from getting displayed on console
-			logger.setUseParentHandlers(false);
-			// if file does not exist we create a new file
-			File log = new File(logFile);
-			if(!log.exists()) {
-				log.createNewFile();
+			File clientLog = new File(clientLogFile);
+			if(!clientLog.exists()) {
+				clientLog.createNewFile();
 			}
-			fh = new FileHandler(logFile,true);  
-			logger.addHandler(fh);
-			SimpleFormatter formatter = new SimpleFormatter();  
-			fh.setFormatter(formatter);  
+			clientLogFileHandler = new FileHandler(clientLogFile,true);
+			clientLogger.addHandler(clientLogFileHandler);
+			SimpleFormatter logFileFormatter = new SimpleFormatter();
+			clientLogFileHandler.setFormatter(logFileFormatter);
 
-		} catch (SecurityException e) {  
-			e.printStackTrace();  
-		} catch (IOException e) {  
-			e.printStackTrace();  
-		} 
-
-		return logger;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return clientLogger;
 	}
 
 	public static void main(String args[]) 
 	{ 
 		try {
-			Client client = new Client(args[0], Integer.parseInt(args[1]));
-			client.start();
+			Client requestFromClient = new Client(args[0], Integer.parseInt(args[1]));
+			requestFromClient.launchClient();
 		} 
 		catch(ArrayIndexOutOfBoundsException e) {
-			System.out.println("Please provide host and port as command line arguments");
+			System.out.println("Provie host name and port number as a part of command line arguments");
 		}
 		catch(NumberFormatException e) {
-			System.out.println("Please provide host and port as command line arguments");
+			System.out.println("Provide host name as a string and port number as a positive Integer");
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

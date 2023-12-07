@@ -242,3 +242,147 @@ Dec 06, 2023 10:34:40 AM server.Server get
 INFO: Request Query [type=get, key=c]
 Dec 06, 2023 10:34:40 AM server.Server get
 INFO: Response [type=get, returnValue=3, message=successfully retrieved entry from storage]
+Dec 07, 2023 10:23:33 AM server.Server main
+INFO: Server started
+Dec 07, 2023 10:23:34 AM server.Server main
+INFO: Server trying to connect to a cluster
+Dec 07, 2023 10:23:34 AM server.Server main
+INFO: Could not connect to any cluster, acting as a standalone cluster
+Dec 07, 2023 10:23:48 AM server.Server putOperation
+INFO: Request Query [type=put, key=g, value=788]
+Dec 07, 2023 10:23:48 AM server.Server putOperation
+INFO: Invoking Proposer
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Fresh Paxos Round has been instantiated
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Fresh Sequence number is 1701962628593
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Sending prepare to server: Server
+Dec 07, 2023 10:23:48 AM server.Server prepare
+INFO: Promising for proposal number: 1701962628593
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Received promise from server
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Majority of acceptors promised
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Value for accept: Transaction [type=put, key=g, value=788]
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Sending accept to server: Server
+Dec 07, 2023 10:23:48 AM server.Server accept
+INFO: Accept request confirmed for transaction: Transaction [type=put, key=g, value=788]
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Received accept
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Majority of acceptors accepted
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Invoking Learners
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Invoking learner: Server
+Dec 07, 2023 10:23:48 AM server.Server callLearner
+INFO: Learner instantiated
+Dec 07, 2023 10:23:48 AM server.Server callLearner
+INFO: Learned a new value: Transaction [type=put, key=g, value=788]
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Learner was able to successfully learn
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Learning job finished
+Dec 07, 2023 10:23:48 AM server.Server callProposer
+INFO: Paxos round ended
+Dec 07, 2023 10:23:48 AM server.Server putOperation
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 07, 2023 10:24:01 AM server.Server getOperation
+INFO: Request Query [type=get, key=g]
+Dec 07, 2023 10:24:01 AM server.Server getOperation
+INFO: Response [type=get, returnValue=788, message=Key was retrieved successfully from HashMap Storage]
+Dec 07, 2023 10:24:08 AM server.Server delete
+INFO: Request Query [type=delete, key=G]
+Dec 07, 2023 10:24:08 AM server.Server delete
+INFO: Invoking Proposer
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Fresh Paxos Round has been instantiated
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Fresh Sequence number is 1701962648877
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Sending prepare to server: Server
+Dec 07, 2023 10:24:08 AM server.Server prepare
+INFO: Promising for proposal number: 1701962648877
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Received promise from server
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Majority of acceptors promised
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Value for accept: Transaction [type=delete, key=G, value=null]
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Sending accept to server: Server
+Dec 07, 2023 10:24:08 AM server.Server accept
+INFO: Accept request confirmed for transaction: Transaction [type=delete, key=G, value=null]
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Received accept
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Majority of acceptors accepted
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Invoking Learners
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Invoking learner: Server
+Dec 07, 2023 10:24:08 AM server.Server callLearner
+INFO: Learner instantiated
+Dec 07, 2023 10:24:08 AM server.Server callLearner
+INFO: Learned a new value: Transaction [type=delete, key=G, value=null]
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Learner was able to successfully learn
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Learning job finished
+Dec 07, 2023 10:24:08 AM server.Server callProposer
+INFO: Paxos round ended
+Dec 07, 2023 10:24:08 AM server.Server delete
+INFO: Response [type=delete, returnValue=null, message=Successfully deleted the entry from the datastore]
+Dec 07, 2023 10:24:17 AM server.Server getOperation
+INFO: Request Query [type=get, key=g]
+Dec 07, 2023 10:24:17 AM server.Server getOperation
+INFO: Response [type=get, returnValue=788, message=Key was retrieved successfully from HashMap Storage]
+Dec 07, 2023 10:24:28 AM server.Server delete
+INFO: Request Query [type=delete, key=g]
+Dec 07, 2023 10:24:28 AM server.Server delete
+INFO: Invoking Proposer
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Fresh Paxos Round has been instantiated
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Fresh Sequence number is 1701962668286
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Sending prepare to server: Server
+Dec 07, 2023 10:24:28 AM server.Server prepare
+INFO: Promising for proposal number: 1701962668286
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Received promise from server
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Majority of acceptors promised
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Value for accept: Transaction [type=delete, key=g, value=null]
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Sending accept to server: Server
+Dec 07, 2023 10:24:28 AM server.Server accept
+INFO: Accept request confirmed for transaction: Transaction [type=delete, key=g, value=null]
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Received accept
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Majority of acceptors accepted
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Invoking Learners
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Invoking learner: Server
+Dec 07, 2023 10:24:28 AM server.Server callLearner
+INFO: Learner instantiated
+Dec 07, 2023 10:24:28 AM server.Server callLearner
+INFO: Learned a new value: Transaction [type=delete, key=g, value=null]
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Learner was able to successfully learn
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Learning job finished
+Dec 07, 2023 10:24:28 AM server.Server callProposer
+INFO: Paxos round ended
+Dec 07, 2023 10:24:28 AM server.Server delete
+INFO: Response [type=delete, returnValue=null, message=Successfully deleted the entry from the datastore]
+Dec 07, 2023 10:24:33 AM server.Server getOperation
+INFO: Request Query [type=get, key=g]
+Dec 07, 2023 10:24:33 AM server.Server getOperation
+INFO: Response [type=get, returnValue=null, message=The requested key g doesn't  exist in the storage]

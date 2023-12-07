@@ -2,37 +2,37 @@ package paxos;
 
 import java.io.Serializable;
 
-import client.Transaction;
+import client.Request;
 
-public class Accepted implements Serializable {
+public class PaxosAccepted implements Serializable {
 	
 	private String serverID;
 	
-	private long proposalNumber;
+	private long sequenceNumber;
 	
-	private Transaction value;
+	private Request transactionValue;
 
-	public long getProposalNumber() {
-		return proposalNumber;
+	public long findSequenceNumber() {
+		return sequenceNumber;
 	}
 
-	public void setProposalNumber(long proposalNumber) {
-		this.proposalNumber = proposalNumber;
+	public void storeSequenceNumber(long sequenceNumber) {
+		this.sequenceNumber = sequenceNumber;
 	}
 
-	public Transaction getValue() {
-		return value;
+	public Request getTransactionValue() {
+		return transactionValue;
 	}
 
-	public void setValue(Transaction value) {
-		this.value = value;
+	public void setTransactionValue(Request transactionValue) {
+		this.transactionValue = transactionValue;
+	}
+	public void setServerID(String serverID) {
+		this.serverID = serverID;
 	}
 
 	public String getServerID() {
 		return serverID;
 	}
 
-	public void setServerID(String serverID) {
-		this.serverID = serverID;
-	}
 }

@@ -2,39 +2,37 @@ package client;
 
 import java.io.Serializable;
 
-//The Request class contains information about the request sent from client to server
-public class Transaction implements Serializable{
+public class Request implements Serializable{
 
 	private static final long serialVersionUID = -5548531573238110706L;
 
-	// Request type sent by the client
-	private String type;
+	private String requestType;
 	
 	// Data in the request
-	private String key;
-	private String value;
+	private String keyToSend;
+	private String valueRetrieved;
 
-	public String getType() {
-		return type;
+	public String getRequestType() {
+		return requestType;
 	}
-	public void setType(String type) {
-		this.type = type;
+	public void setRequestType(String requestType) {
+		this.requestType = requestType;
 	}
-	public String getKey() {
-		return key;
+	public String getKeyToSend() {
+		return keyToSend;
 	}
-	public void setKey(String key) {
-		this.key = key;
+	public void setKeyToSend(String keyToSend) {
+		this.keyToSend = keyToSend;
 	}
-	public String getValue() {
-		return value;
+	public String getValueRetrieved() {
+		return valueRetrieved;
 	}
-	public void setValue(String value) {
-		this.value = value;
+	public void setValueRetrieved(String valueRetrieved) {
+		this.valueRetrieved = valueRetrieved;
 	}
 	@Override
 	public String toString() {
-		return "Transaction [type=" + type + ", key=" + key + ", value=" + value
+		return "Transaction [type=" + requestType + ", key=" + keyToSend + ", value=" + valueRetrieved
 				+ "]";
 	}
 	

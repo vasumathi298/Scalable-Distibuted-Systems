@@ -8,3 +8,45 @@ Dec 06, 2023 10:34:17 AM com.cs6650.Client start
 INFO: Request Query [ipaddress=localhost, type=get, key=b]
 Dec 06, 2023 10:34:17 AM com.cs6650.Client start
 INFO: Response [type=get, returnValue=5, message=successfully retrieved entry from storage]
+Dec 06, 2023 10:56:44 AM client.Client start
+INFO: Remote connection established  [ host:localhost, port:1234 ]
+Dec 06, 2023 10:56:50 AM client.Client start
+INFO: Request Query [ipaddress=localhost, type=get, key=a]
+Dec 06, 2023 10:56:50 AM client.Client start
+INFO: Response [type=get, returnValue=45, message=successfully retrieved entry from storage]
+Dec 06, 2023 10:57:02 AM client.Client start
+INFO: Request Query [ipaddress=localhost, type=put, key=b, value=89]
+Dec 06, 2023 10:57:02 AM client.Client start
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 06, 2023 10:57:39 AM client.Client start
+INFO: Request Query [ipaddress=localhost, type=get, key=a]
+Dec 06, 2023 10:57:39 AM client.Client start
+INFO: Response [type=get, returnValue=null, message=key a does not exist in the storage]
+Dec 06, 2023 10:57:54 AM client.Client start
+INFO: Request Query [ipaddress=localhost, type=delete, key=b]
+Dec 06, 2023 10:57:54 AM client.Client start
+INFO: Response [type=delete, returnValue=null, message=Successfully deleted the entry from the datastore]
+Dec 07, 2023 10:21:20 AM client.Client launchClient
+INFO: Remote connection established  [ host:localhost, port:1234 ]
+Dec 07, 2023 10:21:24 AM client.Client launchClient
+INFO: Request Query [ipaddress=localhost, type=get, key=a]
+Dec 07, 2023 10:21:24 AM client.Client launchClient
+INFO: Response [type=get, returnValue=34, message=Key was retrieved successfully from HashMap Storage]
+Dec 07, 2023 10:21:34 AM client.Client launchClient
+INFO: Request Query [ipaddress=localhost, type=put, key=b, value=2]
+Dec 07, 2023 10:21:34 AM client.Client launchClient
+INFO: Response [type=put, returnValue=null, message=Successfully inserted the entry in the datastore]
+Dec 07, 2023 10:23:55 AM client.Client launchClient
+INFO: Remote connection established  [ host:localhost, port:1234 ]
+Dec 07, 2023 10:24:01 AM client.Client launchClient
+INFO: Request Query [ipaddress=localhost, type=get, key=g]
+Dec 07, 2023 10:24:01 AM client.Client launchClient
+INFO: Response [type=get, returnValue=788, message=Key was retrieved successfully from HashMap Storage]
+Dec 07, 2023 10:24:08 AM client.Client launchClient
+INFO: Request Query [ipaddress=localhost, type=delete, key=G]
+Dec 07, 2023 10:24:08 AM client.Client launchClient
+INFO: Response [type=delete, returnValue=null, message=Successfully deleted the entry from the datastore]
+Dec 07, 2023 10:24:28 AM client.Client launchClient
+INFO: Request Query [ipaddress=localhost, type=delete, key=g]
+Dec 07, 2023 10:24:28 AM client.Client launchClient
+INFO: Response [type=delete, returnValue=null, message=Successfully deleted the entry from the datastore]

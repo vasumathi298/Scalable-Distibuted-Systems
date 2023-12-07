@@ -1,8 +1,8 @@
 package server;
 
-import paxos.Accepted;
-import paxos.Promise;
-import client.Transaction;
+import paxos.PaxosAccepted;
+import paxos.PaxosPromise;
+import client.Request;
 
 import java.net.*;
 import java.rmi.AccessException;
@@ -24,7 +24,7 @@ import java.io.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class Server extends UnicastRemoteObject implements DatastoreInterface
+public class Server extends UnicastRemoteObject implements KVDataStore
 { 
 
 	private static final long serialVersionUID = 1L;
@@ -32,37 +32,36 @@ public class Server extends UnicastRemoteObject implements DatastoreInterface
 	private String serverID;
 
 	// Stores all the data sent from the client
-	private HashMap<String,String> storage = new HashMap<String, String>();
+	private HashMap<String,String> keyValueHashMap = new HashMap<String, String>();
 
 	// Server log is stored in logs folder
-	public Logger logger;
+	public Logger serverLogger;
 
-	private Registry registry;
+	private Registry rmiRegistry;
 
-	private int port;
+	private int portNo;
 
-	private long previousProposalNumber;
+	private long previousSequenceNumber;
 
-	private Transaction previousAcceptedValue;
+	private Request previousTransactionValue;
 
-	private long lastLearnedProposalNumber;
+	private long latestLearnedVal;
 
-	// This value is configurable for random acceptor failures
-	private long randomAcceptorFailureNumber = 81l;
+	private long randAcceptFailNo = 81l;
 
-	private int maxPaxosRetrys = 3;
+	private int paxosMaximumRetries = 3;
 
-	protected Server(String serverID, Registry registry, int port) throws RemoteException {
+	protected Server(String serverID, Registry registry, int portNo) throws RemoteException {
 		super();
 		this.serverID = serverID;
-		this.registry = registry;
-		this.logger = getLogger("server/server.log");
-		this.port = port;
+		this.rmiRegistry = registry;
+		this.serverLogger = getServerLogger("server.log");
+		this.portNo = portNo;
 	}
 
-	public void registerNewServer(String currentServerID, DatastoreInterface server) throws RemoteException{
-		this.registry.rebind(currentServerID, server);
-		this.logger.info("Registered new server: "+currentServerID);
+	public void registerServer(String currServerID, KVDataStore server) throws RemoteException{
+		this.rmiRegistry.rebind(currServerID, server);
+		this.serverLogger.info("New server that got registered is : "+currServerID);
 	}
 
 	public String getServerID() throws RemoteException{
@@ -73,371 +72,361 @@ public class Server extends UnicastRemoteObject implements DatastoreInterface
 		this.serverID = serverID;
 	}
 
-	public HashMap<String, String> getStorage() throws RemoteException {
-		return storage;
+	public HashMap<String, String> getKeyValueHashMap() throws RemoteException {
+		return keyValueHashMap;
 	}
 
-	public void setStorage(HashMap<String, String> storage) {
-		this.storage = storage;
+	public void setKeyValueHashMap(HashMap<String, String> keyValueHashMap) {
+		this.keyValueHashMap = keyValueHashMap;
 	}
 
 
-	public synchronized Response get(String key) throws RemoteException {
-		logger.info("Request Query [type=" + "get" + ", key=" + key + "]");
+	public synchronized Response getOperation(String key) throws RemoteException {
+		serverLogger.info("Request Query [type=" + "get" + ", key=" + key + "]");
 
-		Response response = new Response();
-		response.setType("get");
+		Response serverResponse = new Response();
+		serverResponse.setResponseType("get");
 
-		if(!storage.containsKey(key)){
-			response.setReturnValue(null);
-			response.setMessage("key "+key+" does not exist in the storage");
+		if(!keyValueHashMap.containsKey(key)){
+			serverResponse.setReturnValue(null);
+			serverResponse.setResponseMessage("The requested key "+key+" doesn't  exist in the storage");
 		}
 		else {
-			String val = storage.get(key);
-			response.setReturnValue(val);
-			response.setMessage("successfully retrieved entry from storage");
+			String val = keyValueHashMap.get(key);
+			serverResponse.setReturnValue(val);
+			serverResponse.setResponseMessage("Key was retrieved successfully from HashMap Storage");
 		}	
 
-		logger.info(response.toString());
-		return response;
+		serverLogger.info(serverResponse.toString());
+		return serverResponse;
 	}
 
 
-	public Response put(String key, String value) throws RemoteException {
-		logger.info("Request Query [type=" + "put" + ", key=" + key + ", value=" + value + "]");
-		Transaction transaction = new Transaction();
-		transaction.setType("put");
-		transaction.setKey(key);
-		transaction.setValue(value);
+	public Response putOperation(String keyToStore, String valueToStore) throws RemoteException {
+		serverLogger.info("Request Query [type=" + "put" + ", key=" + keyToStore + ", value=" + valueToStore + "]");
+		Request clientRequest = new Request();
+		clientRequest.setRequestType("put");
+		clientRequest.setKeyToSend(keyToStore);
+		clientRequest.setValueRetrieved(valueToStore);
 
-		logger.info("Invoking Proposer");
+		serverLogger.info("Invoking Proposer");
 
-		Response response = new Response();
-		response.setType("put");
-		response.setReturnValue(null);
+		Response serverResponse = new Response();
+		serverResponse.setResponseType("put");
+		serverResponse.setReturnValue(null);
 
 		try {
-			invokeProposer(transaction);
-			response.setMessage("Successfully inserted the entry in the datastore");
+			callProposer(clientRequest);
+			serverResponse.setResponseMessage("Successfully inserted the entry in the datastore");
 		}
 		catch(TimeoutException e) {
-			response.setMessage("Request timed out");
+			serverResponse.setResponseMessage("Request timed out");
 		}
 
-		logger.info(response.toString());	
-		return response;
+		serverLogger.info(serverResponse.toString());
+		return serverResponse;
 	}
 
-	public Response delete(String key) throws RemoteException {
-		logger.info("Request Query [type=" + "delete" + ", key=" + key + "]");
-		Transaction transaction = new Transaction();
-		transaction.setType("delete");
-		transaction.setKey(key);
-		transaction.setValue(null);
+	public Response delete(String keyToDelete) throws RemoteException {
+		serverLogger.info("Request Query [type=" + "delete" + ", key=" + keyToDelete + "]");
+		Request deleteRequest = new Request();
+		deleteRequest.setRequestType("delete");
+		deleteRequest.setKeyToSend(keyToDelete);
+		deleteRequest.setValueRetrieved(null);
 
-		logger.info("Invoking Proposer");
-		Response response = new Response();
-		response.setType("delete");
-		response.setReturnValue(null);
+		serverLogger.info("Invoking Proposer");
+		Response serverResponse = new Response();
+		serverResponse.setResponseType("delete");
+		serverResponse.setReturnValue(null);
 
 		try{
-			invokeProposer(transaction);
-			response.setMessage("Successfully deleted the entry from the datastore");
+			callProposer(deleteRequest);
+			serverResponse.setResponseMessage("Successfully deleted the entry from the datastore");
 		}
 		catch(TimeoutException e) {
-			response.setMessage("Request timed out");
+			serverResponse.setResponseMessage("Request timed out");
 		}
 
-		logger.info(response.toString());
-		return response;
+		serverLogger.info(serverResponse.toString());
+		return serverResponse;
 
 	}
 
-	public void invokeProposer(Transaction transaction) throws AccessException, RemoteException, TimeoutException {
+	public void callProposer(Request transaction) throws AccessException, RemoteException, TimeoutException {
 
-		boolean isRoundFailed = true;
-		int tryNumber = 1;
+		boolean ifRoundFailed = true;
+		int retryNumber = 1;
 
-		while(isRoundFailed){
-			if(tryNumber > this.maxPaxosRetrys) {
+		while(ifRoundFailed){
+			if(retryNumber > this.paxosMaximumRetries) {
 				throw new TimeoutException();
 			}
-			tryNumber++;
+			retryNumber++;
 
-			logger.info("New Paxos round started");
+			serverLogger.info("Fresh Paxos Round has been instantiated");
 
-			long proposalNumber = System.currentTimeMillis();
-			logger.info("New proposal number is "+proposalNumber);
+			long sequenceNumber = System.currentTimeMillis();
+			serverLogger.info("Fresh Sequence number is "+sequenceNumber);
 
-			List<Promise> promises = new ArrayList<Promise>();
-			for(String serverID: this.registry.list()) {
+			List<PaxosPromise> serverPromises = new ArrayList<PaxosPromise>();
+			for(String aServer: this.rmiRegistry.list()) {
 				try {
-					logger.info("Sending prepare to server: "+serverID);
-					DatastoreInterface server = (DatastoreInterface) this.registry.lookup(serverID);
-					Promise promise = server.prepare(proposalNumber);
-					logger.info("Received promise");
-					promise.setServerID(serverID);
-					promises.add(promise);
+					serverLogger.info("Sending prepare to server: "+aServer);
+					KVDataStore server = (KVDataStore) this.rmiRegistry.lookup(aServer);
+					PaxosPromise promise = server.prepare(sequenceNumber);
+					serverLogger.info("Received promise from server");
+					promise.setServerID(aServer);
+					serverPromises.add(promise);
 				}
 				catch(RemoteException re) {
-					logger.info("Received denial");
+					serverLogger.info("Received denial");
 					continue;
 				} catch (NotBoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
 			}
 
-			if( promises.size() <= this.registry.list().length / 2) {
+			if( serverPromises.size() <= this.rmiRegistry.list().length / 2) {
 				try {
-					logger.info("Majority of acceptors didn't promise, restarting paxos run in 2 seconds");
+					serverLogger.info("Majority of acceptors didn't promise, restarting paxos run in 2 seconds");
 					TimeUnit.SECONDS.sleep(2);
 				} catch (InterruptedException e) {
-					logger.log(Level.SEVERE, "Interrupted Exception", e);
+					serverLogger.log(Level.SEVERE, "Interrupted Exception", e);
 				}
 				continue;
 			}
 
-			logger.info("Majority of acceptors promised");
+			serverLogger.info("Majority of acceptors promised");
 
-			long max = 0l;
-			Transaction value = transaction;
+			long maximum = 0l;
+			Request requestValue = transaction;
 
-			for(Promise promise : promises) {
-				if((promise.getPreviousProposalNumber() != 0) && (promise.getPreviousProposalNumber() > max)) {
-					max = promise.getPreviousProposalNumber();
-					value = promise.getPreviousAcceptedValue();
+			for(PaxosPromise aServerPromise : serverPromises) {
+				if((aServerPromise.getPreviousSequenceNumber() != 0) && (aServerPromise.getPreviousSequenceNumber() > maximum)) {
+					maximum = aServerPromise.getPreviousSequenceNumber();
+					requestValue = aServerPromise.getPreviousTransactionValue();
 				}
 			}
 
-			logger.info("Value for accept: "+value.toString());
-			List<Accepted> accepteds = new ArrayList<Accepted>();
+			serverLogger.info("Value for accept: "+requestValue.toString());
+			List<PaxosAccepted> acceptedPromises = new ArrayList<PaxosAccepted>();
 
-			for(Promise promise : promises) {
+			for(PaxosPromise promise : serverPromises) {
 				try {
-					logger.info("Sending accept to server: "+promise.getServerID());
-					String serverID = promise.getServerID();
-					DatastoreInterface server = (DatastoreInterface) this.registry.lookup(serverID);
-					Accepted acceptedMessage = server.accept(proposalNumber, value);
+					serverLogger.info("Sending accept to server: "+promise.getServerID());
+					String aServer = promise.getServerID();
+					KVDataStore server = (KVDataStore) this.rmiRegistry.lookup(aServer);
+					PaxosAccepted acceptedMessage = server.accept(sequenceNumber, requestValue);
 					acceptedMessage.setServerID(promise.getServerID());
-					accepteds.add(acceptedMessage);
-					logger.info("Received accept");
+					acceptedPromises.add(acceptedMessage);
+					serverLogger.info("Received accept");
 				}
 				catch(RemoteException re) {
-					logger.info("Received reject");
+					serverLogger.info("Received reject");
 					continue;
 				} catch (NotBoundException e) {
-					logger.log(Level.SEVERE, "Not Bound Exception", e);
+					serverLogger.log(Level.SEVERE, "Not Bound Exception", e);
 				}
 			}
 
-			if( accepteds.size() <= this.registry.list().length / 2) {
+			if( acceptedPromises.size() <= this.rmiRegistry.list().length / 2) {
 				try {
-					logger.info("Majority of acceptors didn't accept, restarting paxos run in 2 seconds");
+					serverLogger.info("Majority of acceptors didn't accept, restarting paxos run in 2 seconds");
 					TimeUnit.SECONDS.sleep(2);
 				} catch (InterruptedException e) {
-					logger.log(Level.SEVERE, "Interrupted Exception", e);
+					serverLogger.log(Level.SEVERE, "Interrupted Exception", e);
 				}
 				continue;
 			}
 
-			logger.info("Majority of acceptors accepted");
+			serverLogger.info("Majority of acceptors accepted");
 
-			logger.info("Invoking Learners");
-			for(Accepted accepted: accepteds) {
+			serverLogger.info("Invoking Learners");
+			for(PaxosAccepted accepted: acceptedPromises) {
 				try {
-					logger.info("Invoking learner: "+accepted.getServerID());
-					DatastoreInterface server = (DatastoreInterface) this.registry.lookup(accepted.getServerID());
-					server.invokeLearner(accepted);
-					logger.info("Learner was able to successfully learn");
+					serverLogger.info("Invoking learner: "+accepted.getServerID());
+					KVDataStore server = (KVDataStore) this.rmiRegistry.lookup(accepted.getServerID());
+					server.callLearner(accepted);
+					serverLogger.info("Learner was able to successfully learn");
 				}
 				catch(RemoteException re) {
-					logger.info("Learner failed");
+					serverLogger.info("Learner failed");
 					continue;
 				} catch (NotBoundException e) {
-					logger.log(Level.SEVERE, "Not Bound Exception", e);
+					serverLogger.log(Level.SEVERE, "Not Bound Exception", e);
 				}
 			}
 
-			logger.info("Learning job finished");
+			serverLogger.info("Learning job finished");
 
-			isRoundFailed = false;
+			ifRoundFailed = false;
 		}
-		logger.info("Paxos round ended");
+		serverLogger.info("Paxos round ended");
 	}
 
 
 
-	public Promise prepare(long proposalNumber) throws RemoteException {
-		// Acceptor is configured to fail at random times - If proposal number % randomAcceptorFailureNumber == 0
-		if(proposalNumber % this.randomAcceptorFailureNumber == 0l) {
-			logger.info("Acceptor failed at random time as per configuration");
+	public PaxosPromise prepare(long sequenceNumber) throws RemoteException {
+		if(sequenceNumber % this.randAcceptFailNo == 0l) {
+			serverLogger.info("Acceptor failed at random time as per configuration");
 			throw new RemoteException();
 		}
 
-		if(proposalNumber<=this.previousProposalNumber) {
-			logger.info("Prepare request Declined as previous proposal number("+this.previousProposalNumber+") is greater than new proposal number("+proposalNumber+")");
+		if(sequenceNumber<=this.previousSequenceNumber) {
+			serverLogger.info("Prepare request Declined as previous proposal number("+this.previousSequenceNumber +") is greater than new proposal number("+sequenceNumber+")");
 			throw new RemoteException();
 		}
 
-		Promise promise = new Promise();
-		promise.setProposalNumber(proposalNumber);
-		promise.setPreviousProposalNumber(this.previousProposalNumber);
-		promise.setPreviousAcceptedValue(previousAcceptedValue);
+		PaxosPromise paxosPromise = new PaxosPromise();
+		paxosPromise.setSequenceNumber(sequenceNumber);
+		paxosPromise.setPreviousSequenceNumber(this.previousSequenceNumber);
+		paxosPromise.setPreviousTransactionValue(previousTransactionValue);
 
-		logger.info("Promising for proposal number: "+proposalNumber);
-		return promise;
+		serverLogger.info("Promising for proposal number: "+sequenceNumber);
+		return paxosPromise;
 	}
 
 
 
-	public Accepted accept(long proposalNumber, Transaction value) throws RemoteException {
-		// Acceptor is configured to fail at random times - If proposal number % randomAcceptorFailureNumber == 0
-		if(proposalNumber % this.randomAcceptorFailureNumber == 0l) {
-			logger.info("Acceptor failed at random time as per configuration");
+	public PaxosAccepted accept(long sequenceNumber, Request requestValue) throws RemoteException {
+		if(sequenceNumber % this.randAcceptFailNo == 0l) {
+			serverLogger.info("Acceptor failed at random time as per configuration");
 			throw new RemoteException();
 		}
 
-		if(proposalNumber<this.previousProposalNumber) {
-			logger.info("Accept request Declined as new proposal number("+proposalNumber+") is less than previous proposal numberr("+this.previousProposalNumber+")");
+		if(sequenceNumber<this.previousSequenceNumber) {
+			serverLogger.info("Accept request Declined as new proposal number("+sequenceNumber+") is less than previous proposal numberr("+this.previousSequenceNumber +")");
 			throw new RemoteException();
 		}
 
-		logger.info("Accept request confirmed for transaction: "+value.toString());
+		serverLogger.info("Accept request confirmed for transaction: "+requestValue.toString());
 
-		Accepted accepted = new Accepted();
-		accepted.setProposalNumber(proposalNumber);
-		accepted.setValue(value);
+		PaxosAccepted paxosAccepted = new PaxosAccepted();
+		paxosAccepted.storeSequenceNumber(sequenceNumber);
+		paxosAccepted.setTransactionValue(requestValue);
 
-		return accepted;
+		return paxosAccepted;
 	}
 
-	public synchronized void invokeLearner(Accepted accepted) throws RemoteException{
-		logger.info("Learner invoked");
+	public synchronized void callLearner(PaxosAccepted accepted) throws RemoteException{
+		serverLogger.info("Learner instantiated");
 
-		if(this.lastLearnedProposalNumber == accepted.getProposalNumber()) {
-			logger.info("Aborting learning, value is already learned");
+		if(this.latestLearnedVal == accepted.findSequenceNumber()) {
+			serverLogger.info("Aborting learning, value is already learned");
 			throw new RemoteException();
 		}
 
 		if(accepted.getServerID() == this.serverID) {
-			logger.info("Erasing previous proposal number and accepted value");
-			this.previousProposalNumber = 0;
-			this.previousAcceptedValue = null;
+			serverLogger.info("Erasing previous proposal number and accepted value");
+			this.previousSequenceNumber = 0;
+			this.previousTransactionValue = null;
 		}
 
-		Transaction trasaction = accepted.getValue();
+		Request clientRequest = accepted.getTransactionValue();
 
-		if(trasaction.getType().equals("put")) {
-			this.storage.put(trasaction.getKey(), trasaction.getValue());
+		if(clientRequest.getRequestType().equals("put")) {
+			this.keyValueHashMap.put(clientRequest.getKeyToSend(), clientRequest.getValueRetrieved());
 		}
-		else if(trasaction.getType().equals("delete")){
-			this.storage.remove(trasaction.getKey());
+		else if(clientRequest.getRequestType().equals("delete")){
+			this.keyValueHashMap.remove(clientRequest.getKeyToSend());
 		}
-		this.lastLearnedProposalNumber = accepted.getProposalNumber();
-		logger.info("Learned a new value: "+trasaction.toString());
+		this.latestLearnedVal = accepted.findSequenceNumber();
+		serverLogger.info("Learned a new value: "+clientRequest.toString());
 	}
 
 
-	//takes in the log-file path and builds a logger object
-	private static Logger getLogger(String logFile) {
+	private static Logger getServerLogger(String serverLogFile) {
 		Logger logger = Logger.getLogger("server_log");  
-		FileHandler fh;  
+		FileHandler serverFileHandler;
 
 		try {  
-			File log = new File(logFile);
-			// if file does not exist we create a new file
-			if(!log.exists()) {
-				log.createNewFile();
+			File serverLog = new File(serverLogFile);
+			if(!serverLog.exists()) {
+				serverLog.createNewFile();
 			}
-			fh = new FileHandler(logFile,true);  
-			logger.addHandler(fh);
-			SimpleFormatter formatter = new SimpleFormatter();  
-			fh.setFormatter(formatter);  
+			serverFileHandler = new FileHandler(serverLogFile,true);
+			logger.addHandler(serverFileHandler);
+			SimpleFormatter serverLogFormatted = new SimpleFormatter();
+			serverFileHandler.setFormatter(serverLogFormatted);
 
-		} catch (SecurityException e) {  
-			e.printStackTrace();  
-		} catch (IOException e) {  
-			e.printStackTrace();  
-		} 
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
 
 		return logger;
 	}
 
 
-	public static String createServerID(int port) {
-		String id = null;
+	public static String generateServerID(int portNo) {
+		String serverID = null;
 		try {
 			InetAddress IP = InetAddress.getLocalHost();
-			id = IP.getHostAddress()+"_"+String.valueOf(port);
+			serverID = IP.getHostAddress()+"_"+String.valueOf(portNo);
 
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return id;
+		return serverID;
 	}
 
 	public static void main(String args[]) 
 	{ 
 		try {
-			int port = Integer.parseInt(args[0]);
-			Registry registry = LocateRegistry.createRegistry(Integer.parseInt(args[0]));
-			String currentServerID = createServerID(port);
-			Server server = new Server(currentServerID, registry, port);
+			int portNumber = Integer.parseInt(args[0]);
+			Registry rmiRegistery = LocateRegistry.createRegistry(Integer.parseInt(args[0]));
+			String currentServerID = generateServerID(portNumber);
+			Server server = new Server(currentServerID, rmiRegistery, portNumber);
 
-			registry.rebind("Server", server);
+			rmiRegistery.rebind("Server", server);
 
-			server.logger.info("Server started");
+			server.serverLogger.info("Server started");
 
-			InputStream input = new FileInputStream("resources/config.properties");
-			Properties prop = new Properties();
-			// load a properties file
-			prop.load(input);
-			// get discovery nodes to connect to cluster
-			String[] discoveryNodes = prop.getProperty("discovery.nodes").split(",");
+			InputStream inputStream = new FileInputStream("resources/config.properties");
+			Properties properties = new Properties();
+			properties.load(inputStream);
+			String[] paxosNodes = properties.getProperty("paxos.nodes").split(",");
 
-			boolean discoverySuccessful = false;
-			server.logger.info("Server trying to connect to a cluster");
+			boolean isRegistrySuccessful = false;
+			server.serverLogger.info("Server trying to connect to a cluster");
 
-			for(String discoveryNode : discoveryNodes)
+			for(String aPaxosNode : paxosNodes)
 			{
 				try {
-					String[] data = discoveryNode.split(":");
-					String discoveryNodeIPAddress = data[0];
-					int discoveryNodePort = Integer.parseInt(data[1]);
+					String[] nodes = aPaxosNode.split(":");
+					String paxosNodeIPAddress = nodes[0];
+					int paxosNodePortNo = Integer.parseInt(nodes[1]);
 
-					Registry discoveredRegistry = LocateRegistry.getRegistry(discoveryNodeIPAddress, discoveryNodePort);
+					Registry paxosRegistry = LocateRegistry.getRegistry(paxosNodeIPAddress, paxosNodePortNo);
 
-					for(String serverID : discoveredRegistry.list()) {
+					for(String paxosServer : paxosRegistry.list()) {
 						try {
-							DatastoreInterface discoveredRegistryServer = (DatastoreInterface)discoveredRegistry.lookup(serverID);
-							if(!currentServerID.equals(discoveredRegistryServer.getServerID())) {
-								discoverySuccessful = true;
-								server.setStorage(discoveredRegistryServer.getStorage());
-								discoveredRegistryServer.registerNewServer(currentServerID, server);
-								server.logger.info("Registered current server with server: "+discoveredRegistryServer.getServerID());
-								registry.bind(discoveredRegistryServer.getServerID(), discoveredRegistryServer);
-								server.logger.info("Registered server: "+discoveredRegistryServer.getServerID()+" with current server" );
+							KVDataStore registeredPaxosServer = (KVDataStore)paxosRegistry.lookup(paxosServer);
+							if(!currentServerID.equals(registeredPaxosServer.getServerID())) {
+								isRegistrySuccessful = true;
+								server.setKeyValueHashMap(registeredPaxosServer.getKeyValueHashMap());
+								registeredPaxosServer.registerServer(currentServerID, server);
+								server.serverLogger.info("Registered current server with server: "+registeredPaxosServer.getServerID());
+								rmiRegistery.bind(registeredPaxosServer.getServerID(), registeredPaxosServer);
+								server.serverLogger.info("Registered server: "+registeredPaxosServer.getServerID()+" with current server" );
 							}
 						}
 						catch(ConnectException e) {
 							continue;
 						}
 					}
-					if(discoverySuccessful==true) break;
+					if(isRegistrySuccessful==true) break;
 				}
 				catch(Exception e){
 					continue;
 				}
 			}
 
-			if(!discoverySuccessful) {
-				server.logger.info("Could not connect to any cluster, acting as a standalone cluster");
+			if(!isRegistrySuccessful) {
+				server.serverLogger.info("Could not connect to any cluster, acting as a standalone cluster");
 			}
 			else {
-				server.logger.info("Connected to a cluster");
+				server.serverLogger.info("Connected to a cluster");
 			}
 
 		}

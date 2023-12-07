@@ -2,26 +2,22 @@ package server;
 
 import java.io.Serializable;
 
-//The Response class contains information about the response sent from server to client
 public class Response implements Serializable {
 
 	private static final long serialVersionUID = 8949718079867932728L;
 	
 	// Type of the request to which server is responding
-	private String type;
+	private String responseType;
 	
 	// return value of the request
 	private String returnValue;
 	
 	// Message describing what happened on the server side
-	private String message;
+	private String responseMessage;
 
-	public String getType() {
-		return type;
-	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setResponseType(String responseType) {
+		this.responseType = responseType;
 	}
 
 	public String getReturnValue() {
@@ -32,17 +28,17 @@ public class Response implements Serializable {
 		this.returnValue = returnValue;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getResponseMessage() {
+		return responseMessage;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setResponseMessage(String responseMessage) {
+		this.responseMessage = responseMessage;
 	}
 
 	@Override
 	public String toString() {
-		return "Response [type=" + type + ", returnValue=" + returnValue
-				+ ", message=" + message + "]";
+		return "Response [type=" + responseType + ", returnValue=" + returnValue
+				+ ", message=" + responseMessage + "]";
 	}
 }

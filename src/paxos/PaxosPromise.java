@@ -2,49 +2,50 @@ package paxos;
 
 import java.io.Serializable;
 
-import client.Transaction;
+import client.Request;
 
-public class Promise implements Serializable {
+public class PaxosPromise implements Serializable {
 	
 	private String serverID;
 	
-	private long proposalNumber;
+	private long sequenceNumber;
 	
-	private long previousProposalNumber;
+	private long previousSequenceNumber;
 	 
-	private Transaction previousAcceptedValue;
+	private Request previousTransactionValue;
 
 
 	public String getServerID() {
 		return serverID;
 	}
 
+
+	public long getPreviousSequenceNumber() {
+		return previousSequenceNumber;
+	}
+
 	public void setServerID(String serverID) {
 		this.serverID = serverID;
 	}
 
-	public long getPreviousProposalNumber() {
-		return previousProposalNumber;
+	public void setPreviousSequenceNumber(long previousSequenceNumber) {
+		this.previousSequenceNumber = previousSequenceNumber;
 	}
 
-	public void setPreviousProposalNumber(long previousProposalNumber) {
-		this.previousProposalNumber = previousProposalNumber;
+	public long getSequenceNumber() {
+		return sequenceNumber;
 	}
 
-	public long getProposalNumber() {
-		return proposalNumber;
+	public void setSequenceNumber(long sequenceNumber) {
+		this.sequenceNumber = sequenceNumber;
 	}
 
-	public void setProposalNumber(long proposalNumber) {
-		this.proposalNumber = proposalNumber;
+	public Request getPreviousTransactionValue() {
+		return previousTransactionValue;
 	}
 
-	public Transaction getPreviousAcceptedValue() {
-		return previousAcceptedValue;
-	}
-
-	public void setPreviousAcceptedValue(Transaction previousAcceptedValue) {
-		this.previousAcceptedValue = previousAcceptedValue;
+	public void setPreviousTransactionValue(Request previousTransactionValue) {
+		this.previousTransactionValue = previousTransactionValue;
 	}
 
 }
