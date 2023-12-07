@@ -13,7 +13,7 @@ import java.util.HashMap;
 public interface KVDataStore extends Remote{
 	public Response putOperation(String key, String value) throws RemoteException;
 	public Response getOperation(String key) throws RemoteException;
-	public Response delete(String key) throws RemoteException;
+	public Response deleteOperation(String key) throws RemoteException;
 	public HashMap<String, String> getKeyValueHashMap() throws RemoteException;
 	public String getServerID() throws RemoteException;
 	public PaxosPromise prepare(long proposalNumber) throws RemoteException;

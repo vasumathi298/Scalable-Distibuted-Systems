@@ -127,7 +127,7 @@ public class Server extends UnicastRemoteObject implements KVDataStore
 		return serverResponse;
 	}
 
-	public Response delete(String keyToDelete) throws RemoteException {
+	public Response deleteOperation(String keyToDelete) throws RemoteException {
 		serverLogger.info("Request Query [type=" + "delete" + ", key=" + keyToDelete + "]");
 		Request deleteRequest = new Request();
 		deleteRequest.setRequestType("delete");

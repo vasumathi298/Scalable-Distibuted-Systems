@@ -78,7 +78,7 @@ public class Client
 							String key = inputReader.readLine();
 							clientLogger.info("Request Query [ipaddress=" + this.hostAddress + ", type=" + instructionsToExecute + ", key=" + key + "]");
 
-							Response serverResponse = keyValueDataStore.delete(key);
+							Response serverResponse = keyValueDataStore.deleteOperation(key);
 							clientLogger.info(serverResponse.toString());
 							System.out.println("Response Message: "+serverResponse.getResponseMessage());
 						}
