@@ -26,17 +26,16 @@ import server.paxos.ProposerInterface;
  */
 public class AbstractServer extends RemoteObject implements ProposerInterface, AcceptorInterface, LearnerInterface,RMIServer,
         Serializable {
-  // Map to store, get and delete key/value pairs.
   private ConcurrentHashMap<String, String> concurrentMap = new ConcurrentHashMap<>();
-  private int numServers;
-  private int basePort;
+  private int noOfPaxosServers;
+  private int rootPortNumber;
   private int serverId;
   private boolean isPromised;
-  private int currentSequenceNumber;
-  private int proposedSequenceNumber = 0;
-  private Object acceptedValue;
-  private String response;
-  private List<RMIServer> acceptors;
+  private int currSequenceNo;
+  private int proposedSeqNo = 0;
+  private Object acceptedPromiseValue;
+  private String serverResponse;
+  private List<RMIServer> paxosAcceptors;
 
   private static final Logger logger = Logger.getLogger(AbstractServer.class.getName());
 
@@ -55,13 +54,13 @@ public class AbstractServer extends RemoteObject implements ProposerInterface, A
    * @param numServers The total number of servers in the system.
    */
   public AbstractServer(int serverId, int numServers, int basePort) {
-    this.basePort = basePort;
-    this.numServers = numServers;
+    this.rootPortNumber = basePort;
+    this.noOfPaxosServers = numServers;
     this.serverId = serverId;
-    this.currentSequenceNumber = -1;
+    this.currSequenceNo = -1;
     this.isPromised = false;
-    this.acceptors = new ArrayList<>();
-    this.response = "";
+    this.paxosAcceptors = new ArrayList<>();
+    this.serverResponse = "";
     concurrentMap.put("1","NY");
     concurrentMap.put("2","Boston");
     concurrentMap.put("3","Virginia");
@@ -70,7 +69,7 @@ public class AbstractServer extends RemoteObject implements ProposerInterface, A
   }
   public synchronized void proposeOperation(String clientMessage, String serverResponse,
                                             String clientAddress, String clientPort) throws RemoteException, NotBoundException {
-    this.acceptors = new ArrayList<>();
+    this.paxosAcceptors = new ArrayList<>();
     int proposalId = generateProposalId();
     propose(proposalId, new Operation(clientMessage,serverResponse,clientAddress,clientPort));
   }
@@ -81,8 +80,8 @@ public class AbstractServer extends RemoteObject implements ProposerInterface, A
      *         if(this.isPromised==false)
      *             return 0;
      */
-    if(proposalId>this.currentSequenceNumber){
-      this.currentSequenceNumber = proposalId;
+    if(proposalId>this.currSequenceNo){
+      this.currSequenceNo = proposalId;
       this.isPromised = true;
       System.out.println(getCurrentTime()+" Promise received from port number: "+ this.serverId);
       return 1;
@@ -91,45 +90,43 @@ public class AbstractServer extends RemoteObject implements ProposerInterface, A
     return 0;
   }
   public synchronized String accept(int proposalId, Object proposalValue) throws RemoteException, NotBoundException {
-    // Implement Paxos accept logic here
     System.out.println(getCurrentTime()+" Accepting the operation in all the replicas");
-    for(int i = 0;i<acceptors.size();i++){
-      acceptors.get(i).learn(proposalId,proposalValue);
+    for(int i = 0; i< paxosAcceptors.size(); i++){
+      paxosAcceptors.get(i).learn(proposalId,proposalValue);
     }
-    return acceptors.get(0).recieveResponse();
+    return paxosAcceptors.get(0).recieveResponse();
   }
 
   @Override
   public synchronized void propose(int proposalId, Object proposalValue) throws RemoteException, NotBoundException {
-    // Implement Paxos propose logic here
     System.out.println(getCurrentTime()+" Sending the proposal to all replicas");
-    int numberOfPromises = 0;
-    for(int serverPort = this.basePort;serverPort<this.basePort+this.numServers;serverPort++){
-      if(serverPort!=this.serverId){
-        Registry registry = LocateRegistry.getRegistry("localhost", serverPort);
-        RMIServer process = (RMIServer) registry.lookup("RMIServer"+serverPort);
-        this.acceptors.add(process);
-        numberOfPromises+=process.prepare(proposalId);
+    int noOfPromise = 0;
+    for(int i = this.rootPortNumber; i<this.rootPortNumber +this.noOfPaxosServers; i++){
+      if(i!=this.serverId){
+        Registry registry = LocateRegistry.getRegistry("localhost", i);
+        RMIServer process = (RMIServer) registry.lookup("RMIServer"+i);
+        this.paxosAcceptors.add(process);
+        noOfPromise+=process.prepare(proposalId);
       }
     }
-    if(numberOfPromises<numServers/2){
+    if(noOfPromise< noOfPaxosServers /2){
       System.out.println(getCurrentTime()+" Operation aborted due to no majority");
     }
     else{
       System.out.println(getCurrentTime()+" Majority achieved");
-      this.response = accept(proposalId,proposalValue);
-      this.response = this.response.substring(0,response.length()-4) + serverId;
+      this.serverResponse = accept(proposalId,proposalValue);
+      this.serverResponse = this.serverResponse.substring(0, serverResponse.length()-4) + serverId;
     }
 
   }
   public synchronized void learn(int proposalId, Object acceptedValue) throws RemoteException, NotBoundException {
     this.setProposalValue(acceptedValue);
-    this.acceptRequest(((Operation) this.acceptedValue).clientMessage, ((Operation) this.acceptedValue).serverResponse,
-            ((Operation) this.acceptedValue).clientAddress, String.valueOf(this.serverId));
+    this.acceptRequest(((Operation) this.acceptedPromiseValue).clientMessage, ((Operation) this.acceptedPromiseValue).serverResponse,
+            ((Operation) this.acceptedPromiseValue).clientAddress, String.valueOf(this.serverId));
   }
 
   public synchronized void setProposalValue(Object acceptedValue) throws RemoteException {
-    this.acceptedValue = acceptedValue;
+    this.acceptedPromiseValue = acceptedValue;
   }
 
 
@@ -139,8 +136,8 @@ public class AbstractServer extends RemoteObject implements ProposerInterface, A
    */
   private int generateProposalId() {
     // Placeholder code to generate a unique proposal ID
-    this.proposedSequenceNumber+=1;
-    return this.proposedSequenceNumber;
+    this.proposedSeqNo +=1;
+    return this.proposedSeqNo;
   }
   /**
    * Implementation of the PUT operation. Stores the given key-value pair in the ConcurrentHashMap.
@@ -346,7 +343,7 @@ public class AbstractServer extends RemoteObject implements ProposerInterface, A
   }
 
   public synchronized String recieveResponse() throws RemoteException {
-    return this.response;
+    return this.serverResponse;
   }
   public void simulateFailure() {
     Random random = new Random();
