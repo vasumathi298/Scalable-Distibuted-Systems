@@ -30,7 +30,7 @@ public class AbstractServer extends RemoteObject implements ProposerInterface, A
   private int noOfPaxosServers;
   private int rootPortNumber;
   private int serverId;
-  private boolean isPromised;
+  private boolean randomPromise = false;
   private int currSequenceNo;
   private int proposedSeqNo = 0;
   private Object acceptedPromiseValue;
@@ -58,7 +58,7 @@ public class AbstractServer extends RemoteObject implements ProposerInterface, A
     this.noOfPaxosServers = numServers;
     this.serverId = serverId;
     this.currSequenceNo = -1;
-    this.isPromised = false;
+    this.randomPromise = false;
     this.paxosAcceptors = new ArrayList<>();
     this.serverResponse = "";
     concurrentMap.put("1","NY");
@@ -75,14 +75,14 @@ public class AbstractServer extends RemoteObject implements ProposerInterface, A
   }
   public synchronized int prepare(int proposalId) throws RemoteException {
     /**
-     * Below three lines is for simulating a failure in one of the acceptors during the prepare stage.
+     * Failure Simulation
      *         this.simulateFailure();
-     *         if(this.isPromised==false)
-     *             return 0;
+     *         if(this.randomPromise==false)
+     *             return ;
      */
     if(proposalId>this.currSequenceNo){
       this.currSequenceNo = proposalId;
-      this.isPromised = true;
+      this.randomPromise = true;
       System.out.println(getCurrentTime()+" Promise received from port number: "+ this.serverId);
       return 1;
     }
@@ -354,7 +354,7 @@ public class AbstractServer extends RemoteObject implements ProposerInterface, A
         Thread.sleep(random.nextInt(5000) + 3000); // Sleep for 3 to 8 seconds
 
         // Simulate restarting the acceptor thread
-        isPromised = false;
+        randomPromise = false;
         System.out.println("Acceptor thread restarted.");
       } catch (InterruptedException e) {
         e.printStackTrace();
